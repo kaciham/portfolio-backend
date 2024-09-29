@@ -1,21 +1,26 @@
 const portfolioService = require("../services/portfolio.service")
 
-const createPorfolio = async (req, res) => {
+const createPortfolio = async (req, res) => {
     try {
         const portfolioData = {
             ...req.body,
-            profilePic: req.file ? `imagesPortfolio/${req.file.filename}` : null
-        }
-        const newPorfolio = await portfolioService.createPortfolio(portfolioData);
-        res.status(201).json(newPorfolio);
+            profilePic: req.files?.profilePic ? `imagesPortfolio/${req.files.profilePic[0].filename}` : null,
+            resumePdf: req.files?.resumePdf ? `pdf/${req.files.resumePdf[0].filename}` : null
+        };
+        console.log(req.body);
+        console.log(portfolioData);
+
+        const newPortfolio = await portfolioService.createPortfolio(portfolioData);
+        res.status(201).json(newPortfolio);
     } catch (error) {
         if (error.name === "ValidationError") {
             return res.status(400).json({ message: "Validation Error", details: error.errors });
         } else {
-            return res.status(500).json({ message: "Internal Server Error" });
+            return res.status(500).json({ message: "Internal Server Error", error });
         }
     }
-}
+};
+
 
 const getPortfolioByMail = async (req, res) => {
     try {
@@ -29,7 +34,7 @@ const getPortfolioByMail = async (req, res) => {
         if (error.name === "ValidationError") {
             return res.status(400).json({ message: "Validation Error", details: error.errors });
         } else {
-            return res.status(500).json({ message: "Internal Server Error" });
+            return res.status(500).json({ message: "Internal <Serv></Serv>er Error" });
         }
     }
 }
@@ -39,9 +44,10 @@ const updatePortfolio = async (req, res) => {
         id = req.params.id;
         const portfolioData = {
             ...req.body,
-            profilePic: req.file ? `imagesPortfolio/${req.file.filename}` : null
+            profilePic: req.file ? `imagesPortfolio/${req.file.filename}` : null,
+            resumePdf: req.file ? `resumes/${req.file.filename}` : null 
         };
-        const portfolio = await portfolioService.updatePorfolio(id, portfolioData);
+        const portfolio = await portfolioService.updatePortfolio(id, portfolioData);
         res.status(200).json({ "message": "Portfolio updated", portfolio });
     } catch (error) {
         if (error.name === "ValidationError") {
@@ -67,5 +73,5 @@ const deletePortfolio = async (req, res) => {
 }
 
 module.exports = {
-    createPorfolio, getPortfolioByMail, updatePortfolio, deletePortfolio
+    createPortfolio, getPortfolioByMail, updatePortfolio, deletePortfolio
 }

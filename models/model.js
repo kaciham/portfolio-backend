@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
-//
 
 // Skill Schema
 const SkillSchema = new mongoose.Schema({
     name: { type: String, required: true },
+    category: { type: String, required: true },
     logo: { type: String, required: true }
 });
 
@@ -24,17 +24,19 @@ const ProjectSchema = new mongoose.Schema({
 
 // Portfolio Schema
 const PortfolioSchema = new mongoose.Schema({
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    profilePic: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String },
+    profilePic: { type: String },
     bio: { type: String },
     skills: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Skill' }],
     projects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
     jobs: [{type: mongoose.Schema.Types.ObjectId, ref: 'Job'}],
-    email: { type: String, required: true },
+    email: { type: String },
     phone: { type: String },
     linkedinUrl: { type: String },
-    githubUrl: { type: String }
+    githubUrl: { type: String },
+    scheduleUrl: { type: String },
+    resumePdf: { type: String }
 });
 
 // Create models

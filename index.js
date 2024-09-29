@@ -20,6 +20,7 @@ app.use("/api", router);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/imagesProject', express.static(path.join(__dirname, 'imagesProject')));
 app.use('/imagesPortfolio', express.static(path.join(__dirname, 'imagesPortfolio')));
+app.use('/pdf', express.static(path.join(__dirname, 'pdf')));
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)

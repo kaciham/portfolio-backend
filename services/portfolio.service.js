@@ -2,21 +2,42 @@ const { Portfolio } = require("../models/model")
 
 const createPortfolio = async (portfolioData) => {
     try {
-        const { firstName, lastName, profilePic, title, bio, skills, projects, email, phone, linkedinUrl, githubUrl, jobs } = portfolioData
-        const portfolio = new Portfolio({
-            firstName, lastName, profilePic, title, bio, skills, projects, email, phone, linkedinUrl, githubUrl, jobs
-        });
+        // Create an empty object to store portfolio data
+        const portfolioFields = {};
+
+        // Dynamically add fields if they are present in the portfolioData object
+        if (portfolioData.firstName) portfolioFields.firstName = portfolioData.firstName;
+        if (portfolioData.lastName) portfolioFields.lastName = portfolioData.lastName;
+        if (portfolioData.profilePic) portfolioFields.profilePic = portfolioData.profilePic;
+        if (portfolioData.title) portfolioFields.title = portfolioData.title;
+        if (portfolioData.bio) portfolioFields.bio = portfolioData.bio;
+        if (portfolioData.skills) portfolioFields.skills = portfolioData.skills;
+        if (portfolioData.projects) portfolioFields.projects = portfolioData.projects;
+        if (portfolioData.email) portfolioFields.email = portfolioData.email;
+        if (portfolioData.phone) portfolioFields.phone = portfolioData.phone;
+        if (portfolioData.linkedinUrl) portfolioFields.linkedinUrl = portfolioData.linkedinUrl;
+        if (portfolioData.githubUrl) portfolioFields.githubUrl = portfolioData.githubUrl;
+        if (portfolioData.jobs) portfolioFields.jobs = portfolioData.jobs;
+        if (portfolioData.resumePdf) portfolioFields.resumePdf = portfolioData.resumePdf;
+        if(portfolioData.scheduleUrl) portfolioFields.scheduleUrl = portfolioData.scheduleUrl
+
+        // Create a new portfolio object with the dynamically populated fields
+        const portfolio = new Portfolio(portfolioFields);
+
+        // Save the portfolio in the database
         await portfolio.save();
+
         return portfolio;
     } catch (error) {
-        console.error("Error creating user:", error);
+        console.error("Error creating Portfolio:", error);
         throw error;
     }
-}
+};
+
 
 const getPortfolioByMail = async () => {
     try {
-        const foundedPorfolioByMail = await Portfolio.findOne({ email: "kacihamrounpro@gmail.com" })
+        const foundedPortfolioByMail = await Portfolio.findOne({ email: "kacihamrounpro@gmail.com" })
             .populate({
                 path: 'skills', // Populate the skills field
                 select: 'name logo' // Only include the 'name' and 'logo' fields from Skill
@@ -32,14 +53,14 @@ const getPortfolioByMail = async () => {
                 path: 'jobs',
                 populate: 'title'
             });
-        return foundedPorfolioByMail;
+        return foundedPortfolioByMail;
     } catch (error) {
-        console.error("Error fetching porfolio:", error);
+        console.error("Error fetching portfolio:", error);
         throw error;
     }
 }
 
-const updatePorfolio = async (id, portfolioData) => {
+const updatePortfolio = async (id, portfolioData) => {
     try {
         const portfolio = await Portfolio.findById(id);
 
@@ -47,7 +68,7 @@ const updatePorfolio = async (id, portfolioData) => {
             throw new Error('Portfolio not found');
         }
 
-        const { firstName, lastName, profilePic, bio, skills, projects, email, phone, linkedinUrl, githubUrl, jobs } = portfolioData;
+        const { firstName, lastName, profilePic, bio, skills, projects, email, phone, linkedinUrl, githubUrl, jobs, resumePdf, scheduleUrl } = portfolioData;
 
         // Update the book's properties if they are provided
         if (firstName !== undefined) portfolio.firstName = firstName;
@@ -61,6 +82,8 @@ const updatePorfolio = async (id, portfolioData) => {
         if (linkedinUrl !== undefined) portfolio.linkedinUrl = linkedinUrl;
         if (githubUrl !== undefined) portfolio.githubUrl = githubUrl;
         if (jobs !== undefined) portfolio.jobs = jobs;
+        if(resumePdf !== undefined) portfolio.resumePdf = resumePdf;
+        if(scheduleUrl !== undefined) portfolio.scheduleUrl = scheduleUrl;
 
         // Save the updated book
         await portfolio.save();
@@ -69,18 +92,18 @@ const updatePorfolio = async (id, portfolioData) => {
         return portfolio;
     }
     catch (error) {
-        console.error("Error updating porfolio:", error);
+        console.error("Error updating portfolio:", error);
         throw error;
     }
 }
 
-const deletePorfolio = async (id) => {
+const deletePortfolio = async (id) => {
     try {
         const foundPortfolio = await Portfolio.findById(id);
         await foundPortfolio.deleteOne();
     } catch (error) {
-        console.error("Error fetching porfolio:", error);
+        console.error("Error fetching portfolio:", error);
         throw error;
     }
 }
-module.exports = { createPortfolio, getPortfolioByMail, updatePorfolio, deletePorfolio }
+module.exports = { createPortfolio, getPortfolioByMail, updatePortfolio, deletePortfolio }

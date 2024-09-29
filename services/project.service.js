@@ -24,4 +24,27 @@ const createProject = async (projectData) => {
     }
 }
 
-module.exports = { createProject };
+const updateProject = async (id, projectData) => {
+    try {
+        const project = await Project.findById(id);
+        if(!project){
+            throw new Error('Project not found');
+        }
+
+        const { title, description, projectUrl, imageUrl, skills } = projectData;
+        if (title !== undefined) project.title = title;
+        if (description !== undefined) project.description = description;
+        if (projectUrl !== undefined) project.projectUrl = projectUrl;
+        if (imageUrl !== undefined) project.imageUrl = imageUrl;
+        if (skills !== undefined) project.skills = skills;
+        await project.save();
+        return project
+
+    } catch (error) {
+        console.error("Error updating project:", error);
+        throw error;
+    }
+}
+
+
+module.exports = { createProject, updateProject };

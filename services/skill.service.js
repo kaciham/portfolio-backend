@@ -2,10 +2,11 @@ const { Skill } = require("../models/model");
 
 const createSkill = async (skillData) => {
     try {
-        const { name, logo } = skillData;
+        const { name, logo,category } = skillData;
         const newSkill = new Skill({
             name,
-            logo
+            logo,
+            category
         })
         await newSkill.save()
         return newSkill;
@@ -22,10 +23,11 @@ const updateSkill = async (skillId, skillData) => {
         if (!skill) {
             throw new Error('skill not found')
         }
-        const { name, logo } = skillData
+        const { name, logo, category } = skillData
 
         if (name !== undefined) skill.name = name;
         if (logo !== undefined) skill.logo = logo;
+        if (category !== undefined) skill.category = category;
         console.log(skill)
         await skill.save();
         return skill
@@ -40,10 +42,10 @@ const deleteSkill = async (skillId) => {
         if (!toDeleteSkill) {
             throw new Error("Skill not found");
         }
-        await toDeleteSkill.remove();
+        await toDeleteSkill.deleteOne();
     } catch (error) {
         console.error("Error deleting skill:", error);
-        throw error;
+        throw error;    
     }
 }
 
