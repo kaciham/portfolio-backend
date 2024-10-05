@@ -1,4 +1,5 @@
 
+const { config } = require("dotenv");
 require("./configs/db.config")
 require('dotenv').config();
 
@@ -16,7 +17,7 @@ console.log('====================================');
 
 
 const router = require("./routes/routesIndex.js");
-const { config } = require("dotenv");
+
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -29,6 +30,11 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/imagesProject', express.static(path.join(__dirname, 'imagesProject')));
 app.use('/imagesPortfolio', express.static(path.join(__dirname, 'imagesPortfolio')));
 app.use('/pdf', express.static(path.join(__dirname,  'pdf')));
+
+app.get("/",(req,res) => (
+    res.send("Hello There !")
+)
+)
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
