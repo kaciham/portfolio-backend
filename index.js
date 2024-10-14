@@ -21,10 +21,7 @@ const router = require("./routes/routesIndex.js");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors({
-    origin: 'https://kacihamroun.website', // Replace with your React app's URL
-    methods: ['GET', 'POST'], // Allow these methods
-  }));
+app.use(cors());
 app.use(morgan("tiny"))
 app.use("/api", router);
 
