@@ -21,7 +21,11 @@ const router = require("./routes/routesIndex.js");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST'], // Restrict allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Restrict allowed headers
+}));
 app.use(morgan("tiny"))
 app.use("/api", router);
 
