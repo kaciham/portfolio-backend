@@ -22,7 +22,7 @@ const router = require("./routes/routesIndex.js");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const corsOptions = {
-    origin: 'http://localhost:3000', // Remplacez par l'URL de votre frontend (ou utilisez une liste d'origines autorisées)
+    origin: 'https://portfolio-backend-fplj.vercel.app/', // Remplacez par l'URL de votre frontend (ou utilisez une liste d'origines autorisées)
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true // Permet d'utiliser les cookies et les informations d'identification
