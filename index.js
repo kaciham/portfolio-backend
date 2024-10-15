@@ -21,11 +21,15 @@ const router = require("./routes/routesIndex.js");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors({
-    origin: '*', // Allow all origins
-    methods: ['GET', 'POST'], // Restrict allowed methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Restrict allowed headers
-}));
+const corsOptions = {
+    origin: 'http://localhost:3000', // Remplacez par l'URL de votre frontend (ou utilisez une liste d'origines autorisées)
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true // Permet d'utiliser les cookies et les informations d'identification
+};
+
+app.use(cors(corsOptions));
+
 app.use(morgan("tiny"))
 app.use("/api", router);
 
