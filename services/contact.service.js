@@ -13,12 +13,13 @@ const transporter = nodemailer.createTransport({
     }
 }); 
 
-const sendEmail = async (RecipientEmail, subject, text, emailContact) => {
+const sendEmail = async (RecipientEmail, subject, htmlContent, emailContact) => {
+
     const mailOptions = {
         from: emailContact,
         to: RecipientEmail,
         subject: subject,
-        text: text
+        html: htmlContent
     };
 
     try {

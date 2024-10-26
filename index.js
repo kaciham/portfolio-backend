@@ -1,4 +1,3 @@
-
 const { config } = require("dotenv");
 require("./configs/db.config")
 require('dotenv').config();
@@ -15,14 +14,12 @@ console.log('====================================');
 console.log(port);
 console.log('====================================');
 
-
 const router = require("./routes/routesIndex.js");
-
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const corsOptions = {
-    origin: 'https://kacihamroun.website', // Remplacez par l'URL de votre frontend (ou utilisez une liste d'origines autorisées)
+    origin: ["http://localhost:3000", "https://kacihamroun.website"],// Remplacez par l'URL de votre frontend (ou utilisez une liste d'origines autorisées)
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true // Permet d'utiliser les cookies et les informations d'identification
