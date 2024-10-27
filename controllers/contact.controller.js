@@ -1,9 +1,7 @@
 const { Portfolio } = require('../models/model')
-const { sendEmail } = require('../services/contact.service')
+const {sendEmail, sendAutoReply } = require('../services/contact.service')
 
 const sendContactEmail = async (req, res) => {
-
-
     try {
         const { firstName, lastName, emailContact, text, contactSecondMail } = req.body;
         const portfolio = await Portfolio.find({ email: "kacihamrounpro@gmail.com" });
@@ -11,7 +9,7 @@ const sendContactEmail = async (req, res) => {
             return res.status(404).send('Portfolio not found.');
         }
 
-        const recipientEmail = "kacihamrounpro@gmail.com"; // Portfolio owner's <email></email>
+        const recipientEmail = "kacihamrounpro@gmail.com"; // Portfolio owner's email
         const subject = `New Contact Form Submission from ${firstName + " " + lastName} with this email: ${contactSecondMail}`;
 
         const htmlContent = `
@@ -35,15 +33,17 @@ const sendContactEmail = async (req, res) => {
         </html>
     `;
 
-        // Send the email using the email service
+        // Send the main email
         await sendEmail(recipientEmail, subject, htmlContent, emailContact, contactSecondMail);
 
-        res.status(200).send('Message sent successfully!');
+        // Send auto-reply to the user
+        await sendAutoReply(contactSecondMail, firstName);  // Call the auto-reply function directly with the same request and response
 
+        res.status(200).send('Message sent successfully, and auto-reply has been sent!');
     } catch (error) {
-        console.error('Error sending contact email:', error);
-        res.status(500).send('Failed to send message.');
+        console.error('Error sending contact email or auto-reply:', error);
+        res.status(500).send('Failed to send message or auto-reply.');
     }
-}
+};
 
 module.exports = { sendContactEmail };
