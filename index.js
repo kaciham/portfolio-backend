@@ -9,15 +9,11 @@ const port = process.env.PORT
 const morgan = require("morgan");
 const cors = require("cors")
 const path = require("path")
-
-console.log('====================================');
-console.log(port);
-console.log('====================================');
-
 const router = require("./routes/routesIndex.js");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 const corsOptions = {
     origin: ["http://localhost:3000", "https://kacihamroun.website"],// Remplacez par l'URL de votre frontend (ou utilisez une liste d'origines autorisées)
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
