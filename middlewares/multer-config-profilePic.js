@@ -1,77 +1,73 @@
 const multer = require('multer');
 const path = require('path');
 const sharp = require('sharp');
-const fs = require('fs');
+const fs = require('fs').promises;
 
 const MIME_TYPES = {
     'image/jpg': '.jpg',
     'image/jpeg': '.jpg',
     'image/png': '.png',
-    'pdf/pdf':'.pdf'
+    'pdf/pdf': '.pdf'
 };
-const upload = multer({
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => {
-            if (file.fieldname === 'profilePic') {
-                cb(null, path.join(__dirname, '../imagesPortfolio'));
-            } else if (file.fieldname === 'resumePdf') {
-                cb(null, path.join(__dirname, '../pdf'));
-            }
-        },
-        filename: (req, file, cb) => {
-            const name = file.originalname.split(' ').join('_').split('.')[0];
-            const extension = MIME_TYPES[file.mimetype] || path.extname(file.originalname);
-            const filename = `${name}_${Date.now()}${extension}`;
-            cb(null, filename);
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        if (file.fieldname === 'profilePic') {
+            cb(null, path.join(__dirname, '../imagesPortfolio'));
+        } else if (file.fieldname === 'resumePdf') {
+            cb(null, path.join(__dirname, '../pdf'));
         }
-    }),
-    limits: { fileSize: 8 * 1024 * 1024 }, // 8MB file size limit
-    fileFilter: (req, file, cb) => {
-        const fileExt = path.extname(file.originalname).toLowerCase();
-        if (file.fieldname === 'resumePdf' && fileExt === '.pdf') {
-            cb(null, true); // Accept only PDFs for 'resumePdf'
-        } else if (file.fieldname === 'profilePic' && ['.jpg', '.jpeg', '.png'].includes(fileExt)) {
-            cb(null, true); // Accept only images for 'profilePic'
-        } else {
-            cb(new Error('Invalid file type!'), false); // Reject invalid files
-        }
+    },
+    filename: (req, file, cb) => {
+        const name = file.originalname.split(' ').join('_').split('.')[0];
+        const extension = 'webp';
+        const filename = `${name}_${Date.now()}.${extension}`;
+        req.optimizedFilename = filename;
+        cb(null, filename);
     }
-}).fields([{ name: 'profilePic', maxCount: 1 }, { name: 'resumePdf', maxCount: 1 }]);
+});
 
-const uploadAndOptimizeImagePortfolio = (req, res, next) => {
-    upload(req, res, async (err) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+const upload = multer({ storage }).fields([{ name: 'profilePic', maxCount: 1 }, { name: 'resumePdf', maxCount: 1 }]);
 
-        if (!req.files) {
-            return res.status(400).json({ error: 'No files uploaded' });
-        }
+const uploadAndOptimizeImagePortfolio = async (req, res, next) => {
+    try {
+        await new Promise((resolve, reject) => {
+            upload(req, res, (err) => {
+                if (err) {
+                    console.error("Error during upload:", err);
+                    return reject(res.status(500).json({ error: err.message }));
+                }
+                if (!req.files) {
+                    return reject(res.status(400).json({ error: 'No files uploaded' }));
+                }
+                resolve();
+            });
+        });
 
         if (req.files.profilePic) {
             const originalFilePath = req.files.profilePic[0].path;
-            const optimizedFilePath = path.join(req.files.profilePic[0].destination, `optimized_${req.files.profilePic[0].filename}`);
+            const tempFilePath = path.join(req.files.profilePic[0].destination, `temp_${req.optimizedFilename}`);
+            const optimizedFilePath = path.join(req.files.profilePic[0].destination, req.optimizedFilename);
 
-            try {
-                // Optimize the image
-                await sharp(originalFilePath)
-                    .resize(800) // Resize to 800px width
-                    .jpeg({ quality: 80 }) // Compress the image
-                    .toFile(optimizedFilePath);
+            // Optimiser l'image vers un fichier temporaire
+            await sharp(originalFilePath)
+                .resize(800)
+                .webp({ quality: 80 })
+                .toFile(tempFilePath);
 
-                // Optionally, delete the original file after optimization
-                fs.unlinkSync(originalFilePath);
+            // Supprimer le fichier original et renommer le fichier temporaire
+            await fs.unlink(originalFilePath);
+            await fs.rename(tempFilePath, optimizedFilePath);
 
-                // Update req.files.profilePic to point to the optimized image
-                req.files.profilePic[0].path = optimizedFilePath;
-                req.files.profilePic[0].filename = `optimized_${req.files.profilePic[0].filename}`;
-            } catch (error) {
-                return res.status(500).json({ error: 'Error optimizing image' });
-            }
+            req.files.profilePic[0].path = optimizedFilePath;
+            req.files.profilePic[0].filename = req.optimizedFilename;
         }
 
-        next(); // Proceed to the next middleware or route handler
-    });
+        next();
+    } catch (error) {
+        console.error("Error optimizing image:", error);
+        res.status(500).json({ error: 'Error optimizing image' });
+    }
 };
 
 module.exports = uploadAndOptimizeImagePortfolio;

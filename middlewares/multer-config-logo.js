@@ -1,61 +1,70 @@
 const multer = require('multer');
 const path = require('path');
 const sharp = require('sharp');
-const fs = require('fs');
+const fs = require('fs').promises;
 
+// Définition des types MIME autorisés
 const MIME_TYPES = {
     'image/jpg': 'jpg',
     'image/jpeg': 'jpg',
-    'image/png': 'png'
+    'image/png': 'png',
+    'image/webp': 'webp'
 };
 
+// Configuration de multer pour l'upload des fichiers
 const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
+    destination: (_req, _file, callback) => {
         callback(null, path.join(__dirname, '../images'));
     },
     filename: (req, file, callback) => {
         const name = file.originalname.split(' ').join('_').split('.')[0];
-        const extension = MIME_TYPES[file.mimetype];
+        const extension = 'webp';
         const filename = `${name}_${Date.now()}.${extension}`;
+        req.optimizedFilename = filename;
         callback(null, filename);
     }
 });
 
 const upload = multer({ storage }).single('logo');
 
-// Middleware to handle image upload and optimization
-const uploadAndOptimizeImage = (req, res, next) => {
-    upload(req, res, async (err) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
-        }
+// Middleware pour l'upload et l'optimisation de l'image
+const uploadAndOptimizeImage = async (req, res, next) => {
+    try {
+        await new Promise((resolve, reject) => {
+            upload(req, res, (err) => {
+                if (err) {
+                    console.error("Error during upload:", err);
+                    return reject(res.status(500).json({ error: err.message }));
+                }
+                if (!req.file) {
+                    return reject(res.status(400).json({ error: 'No file uploaded' }));
+                }
+                resolve();
+            });
+        });
 
         const originalFilePath = req.file.path;
-        const optimizedFilePath = path.join(req.file.destination, `optimized_${req.file.filename}`);
+        const tempFilePath = path.join(req.file.destination, `temp_${req.optimizedFilename}`);
+        const optimizedFilePath = path.join(req.file.destination, req.optimizedFilename);
 
-        try {
-            // Optimize the image
-            await sharp(originalFilePath)
-                .resize(800) // Resize to 800px width
-                .jpeg({ quality: 80 }) // Compress the image
-                .toFile(optimizedFilePath);
+        // Optimiser l'image vers un fichier temporaire
+        await sharp(originalFilePath)
+            .resize(800)
+            .webp({ quality: 80 })
+            .toFile(tempFilePath);
 
-            // Optionally, delete the original file after optimization
-            fs.unlinkSync(originalFilePath);
+        // Supprimer le fichier original et renommer le fichier temporaire
+        await fs.unlink(originalFilePath);
+        await fs.rename(tempFilePath, optimizedFilePath);
 
-            // Update req.file to point to the optimized image
-            req.file.path = optimizedFilePath;
-            req.file.filename = `optimized_${req.file.filename}`;
+        req.file.path = optimizedFilePath;
+        req.file.filename = req.optimizedFilename;
 
-            next(); // Proceed to the next middleware or route handler
-        } catch (error) {
-            return res.status(500).json({ error: 'Error optimizing image' });
-        }
-    });
+        next();
+    } catch (error) {
+        console.error("Error optimizing image:", error);
+        res.status(500).json({ error: 'Error optimizing image' });
+    }
 };
 
 module.exports = uploadAndOptimizeImage;
