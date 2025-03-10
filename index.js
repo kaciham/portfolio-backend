@@ -15,10 +15,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const corsOptions = {
-    origin: ["http://localhost:3000", "https://kacihamroun.website"],// Remplacez par l'URL de votre frontend (ou utilisez une liste d'origines autorisées)
+    origin: "*", // Allow all origins
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true // Permet d'utiliser les cookies et les informations d'identification
+    credentials: true // Allow cookies and credentials
 };
 
 app.use(cors(corsOptions));
