@@ -17,7 +17,7 @@ app.use(express.json());
 const corsOptions = {
     "Access-Control-Allow-Origin": "*",
     origin: "*", // Allow all origins
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true // Allow cookies and credentials
 };
