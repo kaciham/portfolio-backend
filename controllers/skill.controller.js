@@ -1,27 +1,27 @@
 const res = require("express/lib/response");
 const skillService = require("../services/skill.service");
 
-const createSkill = async (req, res) => {
-    try {
-        const skillData = {
-            ...req.body,
-            name: req.body.name ? req.body.name.toLowerCase() : '',
-            category: req.body.category ? req.body.category.toLowerCase() : '',
-            logo: req.file ? `images/${req.file.filename}` : null
-        }
-        const newSkill = await skillService.createSkill(skillData);
-        res.status(201).json({ "message": "Skill has been created", "skill": newSkill });
-    } catch (error) {
-        console.error("Error creating skill:", error);
+    const createSkill = async (req, res) => {
+        try {
+            const skillData = {
+                ...req.body,
+                name: req.body.name ? req.body.name.toLowerCase() : '',
+                category: req.body.category ? req.body.category.toLowerCase() : '',
+                logo: req.file ? `images/${req.file.filename}` : null
+            }
+            const newSkill = await skillService.createSkill(skillData);
+            res.status(201).json({ "message": "Skill has been created", "skill": newSkill });
+        } catch (error) {
+            console.error("Error creating skill:", error);
 
-        // Send appropriate error response
-        if (error.name === "ValidationError") {
-            return res.status(400).json({ message: "Validation Error", details: error.errors });
-        } else {
-            return res.status(500).json({ message: "Internal Server Error" });
+            // Send appropriate error response
+            if (error.name === "ValidationError") {
+                return res.status(400).json({ message: "Validation Error", details: error.errors });
+            } else {
+                return res.status(500).json({ message: "Internal Server Error" });
+            }
         }
     }
-}
 
 
 const updateSkill = async (req, res) => {
