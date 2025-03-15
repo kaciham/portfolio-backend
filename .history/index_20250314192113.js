@@ -15,10 +15,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const corsOptions = {
-    origin: "https://kacihamroun.website",
-    methods: "GET,POST,PUT,DELETE,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization",
-    credentials: true
+    origin: "https://kacihamroun.website.com",
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    maxAge: 86400, // Cache preflight request results for 24 hours
+    exposedHeaders: ["Content-Length", "Content-Type"],
+    optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
