@@ -16,11 +16,10 @@ app.use(express.json());
 
 const corsOptions = {
     origin: ['https://kacihamroun.website', 'http://localhost:3000'],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
     credentials: true,
-    optionsSuccessStatus: 200,
-    preflightContinue: false
+    optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));

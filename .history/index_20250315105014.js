@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const corsOptions = {
-    origin: ['https://kacihamroun.website', 'http://localhost:3000'],
+    origin: ['https://kacihamroun.website', 'http://localhost:3000', 'http://localhost:5173'],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
     credentials: true,
