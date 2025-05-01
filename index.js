@@ -15,11 +15,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const corsOptions = {
-    "Access-Control-Allow-Origin": ['*'],
-    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
-    "Access-Control-Allow-Credentials": true,
-    "Access-Control-Allow-Max-Age": 8640
+    origin: ['http://localhost:3000', 'https://kacihamroun.website'],
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true,
+    maxAge: 8640
 };
 
 app.use(cors(corsOptions));
