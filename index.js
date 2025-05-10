@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const corsOptions = {
-    origin: ['http://localhost:3000', 'https://kacihamroun.website','https://portfolio-backend-fplj.vercel.app/',"dee.ns.cloudflare.com","santino.ns.cloudflare.com"],
+    origin: ['http://localhost:3000', 'https://kacihamroun.website','https://portfolio-backend-fplj.vercel.app/',"dee.ns.cloudflare.com","santino.ns.cloudflare.com","https://portfolio-backend-fplj.vercel.app/api/kaci"],
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
