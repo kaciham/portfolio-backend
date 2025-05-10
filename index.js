@@ -1,10 +1,8 @@
-const { config } = require("dotenv");
 require("./configs/db.config")
 require('dotenv').config();
 
 const express = require("express");
 const app = express()
-const multer = require("multer")
 const port = process.env.PORT
 const morgan = require("morgan");
 const cors = require("cors")
@@ -15,11 +13,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const corsOptions = {
-    origin: ['http://localhost:3000', 'https://kacihamroun.website'],
+    origin: ['http://localhost:3000', 'https://kacihamroun.website','https://portfolio-backend-fplj.vercel.app/',"dee.ns.cloudflare.com","santino.ns.cloudflare.com"],
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
-    maxAge: 8640
 };
 
 app.use(cors(corsOptions));
@@ -35,9 +32,9 @@ app.use('/pdf', express.static(path.join(__dirname,  'pdf')));
 
 app.get("/",(req,res) => (
     res.send("Hello There !")
-)
+    )
 )
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
-})  
+    })  
