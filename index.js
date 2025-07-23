@@ -12,11 +12,12 @@ const router = require("./routes/routesIndex.js");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+
 const corsOptions = {
-    origin: '*', // Allow all origins
-    methods: '*', // Allow all HTTP methods
-    allowedHeaders: '*', // Allow all headers
-    credentials: true, // Allow credentials
+    origin: true, // Autorise l'origine de la requête
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
 };
 
 app.use(cors(corsOptions));
