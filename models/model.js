@@ -15,6 +15,8 @@ const JobSchema = new mongoose.Schema({
 // Project Schema
 const ProjectSchema = new mongoose.Schema({
     title: { type: String },
+    problematic: { type: String },
+    solution: { type: String },
     description: { type: String },
     skills: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Skill' }],
     imageUrl: { type: String },
