@@ -13,8 +13,29 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
+const whitelist = [
+    'https://kacihamroun.website',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'capacitor://localhost',
+    'ionic://localhost',
+    'http://localhost',
+    'file://'
+];
+
 const corsOptions = {
-    origin: ['https://kacihamroun.website', 'http://localhost:3000', 'http://localhost:5173'],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, curl, postman)
+        if (!origin) {
+            return callback(null, true);
+        }
+        // Check if the origin is in the whitelist
+        if (whitelist.indexOf(origin) !== -1 || whitelist.some(w => origin.startsWith(w))) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With'],
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
@@ -27,6 +48,12 @@ const corsOptions = {
 // Apply CORS middleware before other routes
 // Handle OPTIONS preflight requests
 app.options('*', cors(corsOptions));
+
+// Add security headers
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Private-Network', 'true');
+    next();
+});
 
 app.use(cors(corsOptions));
 
