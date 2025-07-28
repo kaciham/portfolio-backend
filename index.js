@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 const corsOptions = {
-    origin: process.env.FRONTEND_URL,
+    origin: ['https://kacihamroun.website', 'http://localhost:3000', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With'],
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
@@ -25,6 +25,9 @@ const corsOptions = {
 };
 
 // Apply CORS middleware before other routes
+// Handle OPTIONS preflight requests
+app.options('*', cors(corsOptions));
+
 app.use(cors(corsOptions));
 
 app.use(morgan("tiny"))
