@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 const whitelist = [
-    'https://kacihamroun.website',
+    'https://kacihamroun.com',
     'http://localhost:3000',
     'http://localhost:5173',
     'capacitor://localhost',
