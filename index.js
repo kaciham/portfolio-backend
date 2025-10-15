@@ -8,57 +8,52 @@ const morgan = require("morgan");
 const cors = require("cors")
 const path = require("path")
 const router = require("./routes/routesIndex.js");
+const { corsOptions, isDevelopment } = require("./configs/cors.config.js");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
-const whitelist = [
-    'https://kacihamroun.com',
-    'https://kacihamroun.website',
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'capacitor://localhost',
-    'ionic://localhost',
-    'http://localhost',
-    'file://'
-];
+// Apply CORS middleware globally
+app.use(cors(corsOptions));
 
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps, curl, postman)
-        if (!origin) {
-            return callback(null, true);
-        }
-        // Check if the origin is in the whitelist
-        if (whitelist.indexOf(origin) !== -1 || whitelist.some(w => origin.startsWith(w))) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With'],
-    exposedHeaders: ['Content-Range', 'X-Content-Range'],
-    credentials: true,
-    maxAge: 86400, // 24 hours
-    preflightContinue: false,
-    optionsSuccessStatus: 204
-};
+// Handle CORS errors gracefully
+app.use((err, req, res, next) => {
+    if (err.message && err.message.includes('CORS policy violation')) {
+        return res.status(403).json({
+            error: 'CORS Error',
+            message: isDevelopment ? err.message : 'Access denied',
+            origin: isDevelopment ? req.headers.origin : undefined
+        });
+    }
+    next(err);
+});
 
-// Apply CORS middleware before other routes
-// Handle OPTIONS preflight requests
-app.options('*', cors(corsOptions));
-
-// Add security headers
+// Add security and development headers
 app.use((req, res, next) => {
+    // Allow private network access (useful for local development)
     res.header('Access-Control-Allow-Private-Network', 'true');
+    
+    // Add development-friendly headers
+    if (isDevelopment) {
+        res.header('X-Development-Mode', 'true');
+    }
+    
     next();
 });
 
-app.use(cors(corsOptions));
-
 app.use(morgan("tiny"))
+
+// Development CORS logging
+if (isDevelopment) {
+    app.use((req, res, next) => {
+        if (req.headers.origin) {
+            console.log(`🌐 CORS Request from: ${req.headers.origin}`);
+        }
+        next();
+    });
+}
+
 app.use("/api", router);
 
 ///Images static directory
