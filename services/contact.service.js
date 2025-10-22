@@ -1,42 +1,64 @@
-const nodemailer = require("nodemailer")
+const nodemailer = require("nodemailer");
+
+// Use env vars for credentials in production. Fallback kept for local/dev.
+const EMAIL_USER = process.env.EMAIL_USER || 'kacihamrounpro@gmail.com';
+const EMAIL_PASS = process.env.EMAIL_PASS || 'szzt tzgp xxfn fdkp';
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-        user: 'kacihamrounpro@gmail.com',
-        pass: 'szzt tzgp xxfn fdkp'
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
     },
     tls: {
-        rejectUnauthorized: false
-    }
-}); 
+        rejectUnauthorized: false,
+    },
+    // timeouts (milliseconds) to fail fast on network issues
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+});
+
+// Verify transporter on app start to detect config issues early
+transporter.verify().then(() => {
+    console.log('Mail transporter ready');
+}).catch((err) => {
+    console.error('Mail transporter verification failed:', err && err.message ? err.message : err);
+});
+
+// Helper to add a hard timeout on top of nodemailer's timeouts
+const sendWithTimeout = (mailOptions, timeoutMs = 15000) => {
+    return Promise.race([
+        transporter.sendMail(mailOptions),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Email send timeout')), timeoutMs)),
+    ]);
+};
 
 const sendEmail = async (RecipientEmail, subject, htmlContent, emailContact) => {
-
     const mailOptions = {
-        from: emailContact,
+        from: emailContact || EMAIL_USER,
         to: RecipientEmail,
         subject: subject,
-        html: htmlContent
+        html: htmlContent,
     };
 
     try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`Email sent: ${info.response}`);
+        const info = await sendWithTimeout(mailOptions, 15000);
+        console.log(`Email sent: ${info && info.response ? info.response : JSON.stringify(info)}`);
         return info;
     } catch (error) {
-        console.error('Error sending email:', error);
+        console.error('Error sending email:', error && error.message ? error.message : error);
         throw error;
     }
-}
+};
 
 const sendAutoReply = async (RecipientEmail, firstName) => {
     const autoReplyOptions = {
-        from: 'kacihamrounpro@gmail.com', // Your email
+        from: EMAIL_USER,
         to: RecipientEmail,
-        subject: 'Thank you for your message!',
+        subject: 'Merci pour votre demande de contact !',
         html: `
         <!DOCTYPE html>
       <html>
@@ -46,7 +68,7 @@ const sendAutoReply = async (RecipientEmail, firstName) => {
                 <td>
                     <h2 style="color: #0073e6;">Bonjour ${firstName},</h2>
                     <p style="font-size: 16px; color: #555;">
-                        Merci pour votre message ! Votre demande a bien été reçu, je reviendrai vers vous dès que possible.
+                        Merci pour votre message ! Votre demande a bien été reçue, je reviendrai vers vous dès que possible.
                     </p>
                     <p style="font-size: 16px; color: #333;">
                         Cordialement, <br> Kaci HAMROUN
@@ -62,14 +84,13 @@ const sendAutoReply = async (RecipientEmail, firstName) => {
     };
 
     try {
-        const info = await transporter.sendMail(autoReplyOptions);
-        console.log(`Auto-reply sent: ${info.response}`);
+        const info = await sendWithTimeout(autoReplyOptions, 15000);
+        console.log(`Auto-reply sent: ${info && info.response ? info.response : JSON.stringify(info)}`);
         return info;
     } catch (error) {
-        console.error('Error sending auto-reply email:', error);
+        console.error('Error sending auto-reply email:', error && error.message ? error.message : error);
         throw error;
     }
 };
-
 
 module.exports = { sendEmail, sendAutoReply };

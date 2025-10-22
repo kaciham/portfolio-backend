@@ -4,7 +4,8 @@ const {sendEmail, sendAutoReply } = require('../services/contact.service')
 const sendContactEmail = async (req, res) => {
     try {
         const { firstName, lastName, emailContact, text, contactSecondMail } = req.body;
-        const portfolio = await Portfolio.find({ email: "kacihamrounpro@gmail.com" });
+        // `find` returns an array. Use `findOne` to get a single doc or check length.
+        const portfolio = await Portfolio.findOne({ email: "kacihamrounpro@gmail.com" });
         if (!portfolio) {
             return res.status(404).send('Portfolio not found.');
         }
