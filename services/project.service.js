@@ -33,7 +33,7 @@ const updateProject = async (id, projectData) => {
             throw new Error('Project not found');
         }
 
-        const { title, description, projectUrl, imageUrl, skills } = projectData;
+        const { title, description, projectUrl, imageUrl, skills, problematic, solution } = projectData;
         if (title !== undefined) project.title = title;
         if (description !== undefined) project.description = description;
         if (projectUrl !== undefined) project.projectUrl = projectUrl;
@@ -50,5 +50,27 @@ const updateProject = async (id, projectData) => {
     }
 }
 
+const getAllProjects = async () => {
+    try {
+        const projects = await Project.find({}).populate('skills', 'name logo category');
+        return projects;
+    } catch (error) {
+        console.error("Error getting projects:", error);
+        throw error;
+    }
+}
 
-module.exports = { createProject, updateProject };
+const deleteProject = async (projectId) => {
+    try {
+        const toDeleteProject = await Project.findById(projectId);
+        if (!toDeleteProject) {
+            throw new Error("Project not found");
+        }
+        await toDeleteProject.deleteOne();
+    } catch (error) {
+        console.error("Error deleting project:", error);
+        throw error;
+    }
+}
+
+module.exports = { createProject, updateProject, getAllProjects, deleteProject };

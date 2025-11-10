@@ -37,25 +37,32 @@ const createPortfolio = async (portfolioData) => {
 
 const getPortfolioByMail = async () => {
     try {
-        const foundedPortfolioByMail = await Portfolio.findOne({ email: "kacihamrounpro@gmail.com" })
+        const { Skill, Job, Project } = require("../models/model");
+
+        // Get all data
+        const skills = await Skill.find({});
+        const jobs = await Job.find({});
+        const projects = await Project.find({}).populate('skills', 'name logo category');
+        const portfolios = await Portfolio.find({})
+            .populate('skills', 'name logo category')
             .populate({
-                path: 'skills', // Populate the skills field
-                select: 'name logo' // Only include the 'name' and 'logo' fields from Skill
-            })
-            .populate({
-                path: 'projects', // Populate the projects field
-                populate: { // Nested populate for skills within projects
+                path: 'projects',
+                populate: {
                     path: 'skills',
-                    select: 'name logo' // Include 'name' and 'logo' for skills within projects
+                    select: 'name logo category'
                 }
             })
-            .populate({
-                path: 'jobs',
-                populate: 'title'
-            });
-        return foundedPortfolioByMail;
+            .populate('jobs', 'title');
+
+        // Return all data in one response
+        return {
+            skills,
+            jobs,
+            projects,
+            portfolios
+        };
     } catch (error) {
-        console.error("Error fetching portfolio:", error);
+        console.error("Error fetching data:", error);
         throw error;
     }
 }
@@ -106,4 +113,24 @@ const deletePortfolio = async (id) => {
         throw error;
     }
 }
-module.exports = { createPortfolio, getPortfolioByMail, updatePortfolio, deletePortfolio }
+
+const getAllPortfolios = async () => {
+    try {
+        const portfolios = await Portfolio.find({})
+            .populate('skills', 'name logo category')
+            .populate({
+                path: 'projects',
+                populate: {
+                    path: 'skills',
+                    select: 'name logo category'
+                }
+            })
+            .populate('jobs', 'title');
+        return portfolios;
+    } catch (error) {
+        console.error("Error getting portfolios:", error);
+        throw error;
+    }
+}
+
+module.exports = { createPortfolio, getPortfolioByMail, updatePortfolio, deletePortfolio, getAllPortfolios }

@@ -10,6 +10,7 @@ const uploadAndOptimizeImageProject = require("../middlewares/multer-config-imag
 const uploadAndOptimizeImagePortfolio = require('../middlewares/multer-config-profilePic')
 // const uploadPdf = require('../middlewares/pdf')
 
+// POST routes
 router.post("/skills", uploadAndOptimizeImage, skillController.createSkill)
 router.post("/jobs", jobController.createJob)
 router.post("/projects", uploadAndOptimizeImageProject, projectController.createProject)
@@ -17,13 +18,19 @@ router.post("/portfolios", uploadAndOptimizeImagePortfolio, portfolioController.
 router.post("/contacts", contactController.sendContactEmail)
 // router.post("/contacts/reply", contactController.sendContactReply);
 
+// GET routes - All data in one endpoint
 router.get("/kaci", portfolioController.getPortfolioByMail)
 
+// PUT routes
 router.put("/portfolios/:id", uploadAndOptimizeImagePortfolio, portfolioController.updatePortfolio);
-router.put("/skills/:id", skillController.updateSkill)
-router.put("/projects/:id", projectController.updateProject)
+router.put("/skills/:id", uploadAndOptimizeImage, skillController.updateSkill)
+router.put("/projects/:id", uploadAndOptimizeImageProject, projectController.updateProject)
+router.put("/jobs/:id", jobController.updateJob)
 
+// DELETE routes
 router.delete("/portfolios/:id", portfolioController.deletePortfolio);
 router.delete("/skills/:id", skillController.deleteSkill)
+router.delete("/projects/:id", projectController.deleteProject)
+router.delete("/jobs/:id", jobController.deleteJob)
 
 module.exports = router;            

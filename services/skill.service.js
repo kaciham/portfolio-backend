@@ -38,17 +38,27 @@ const updateSkill = async (skillId, skillData) => {
 }
 const deleteSkill = async (skillId) => {
     try {
-        const toDeleteSkill = Skill.findById(skillId);
+        const toDeleteSkill = await Skill.findById(skillId);
         if (!toDeleteSkill) {
             throw new Error("Skill not found");
         }
         await toDeleteSkill.deleteOne();
     } catch (error) {
         console.error("Error deleting skill:", error);
-        throw error;    
+        throw error;
+    }
+}
+
+const getAllSkills = async () => {
+    try {
+        const skills = await Skill.find({});
+        return skills;
+    } catch (error) {
+        console.error("Error getting skills:", error);
+        throw error;
     }
 }
 
 module.exports = {
-    createSkill, updateSkill, deleteSkill
+    createSkill, updateSkill, deleteSkill, getAllSkills
 }

@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage }).single('imageUrl');
+const upload = multer({ storage }).single('image');
 
 const uploadAndOptimizeImageProject = async (req, res, next) => {
     try {
@@ -31,14 +31,17 @@ const uploadAndOptimizeImageProject = async (req, res, next) => {
             upload(req, res, (err) => {
                 if (err) {
                     console.error("Error during upload:", err);
-                    return reject(res.status(500).json({ error: err.message }));
+                    return reject(err);
                 }
-                if (!req.file) {
-                    return reject(res.status(400).json({ error: 'No file uploaded' }));
-                }
+                // If no file is uploaded, continue without error (image is optional)
                 resolve();
             });
         });
+
+        // If no file was uploaded, skip optimization and continue
+        if (!req.file) {
+            return next();
+        }
 
         const originalFilePath = req.file.path;
         const tempFilePath = path.join(req.file.destination, `temp_${req.optimizedFilename}`);
@@ -60,7 +63,9 @@ const uploadAndOptimizeImageProject = async (req, res, next) => {
         next();
     } catch (error) {
         console.error("Error optimizing image:", error);
-        res.status(500).json({ error: 'Error optimizing image' });
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Error optimizing image' });
+        }
     }
 };
 

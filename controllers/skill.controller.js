@@ -50,7 +50,7 @@ const updateSkill = async (req, res) => {
 
 const deleteSkill = async (req, res) => {
 try {
-    
+
     const id = req.params.id;
     const skill = await skillService.deleteSkill(id);
     res.status(200).json({ "message": "Skill deleted", skill });
@@ -66,6 +66,16 @@ try {
 }
 }
 
+const getAllSkills = async (req, res) => {
+    try {
+        const skills = await skillService.getAllSkills();
+        res.status(200).json(skills);
+    } catch (error) {
+        console.error("Error getting skills:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
 module.exports = {
-    createSkill, updateSkill, deleteSkill
+    createSkill, updateSkill, deleteSkill, getAllSkills
 }

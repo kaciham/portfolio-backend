@@ -62,6 +62,13 @@ app.use('/imagesProject', express.static(path.join(__dirname, 'imagesProject')))
 app.use('/imagesPortfolio', express.static(path.join(__dirname, 'imagesPortfolio')));
 app.use('/pdf', express.static(path.join(__dirname,  'pdf')));
 
+// Serve admin interface
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+app.get("/admin", (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 app.get("/",(req,res) => (
     res.send("Hello There !")
     )

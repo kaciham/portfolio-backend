@@ -37,14 +37,12 @@ const uploadAndOptimizeImagePortfolio = async (req, res, next) => {
                     console.error("Error during upload:", err);
                     return reject(res.status(500).json({ error: err.message }));
                 }
-                if (!req.files) {
-                    return reject(res.status(400).json({ error: 'No files uploaded' }));
-                }
+                // Allow requests without files for updates
                 resolve();
             });
         });
 
-        if (req.files.profilePic) {
+        if (req.files && req.files.profilePic) {
             const originalFilePath = req.files.profilePic[0].path;
             const tempFilePath = path.join(req.files.profilePic[0].destination, `temp_${req.optimizedFilename}`);
             const optimizedFilePath = path.join(req.files.profilePic[0].destination, req.optimizedFilename);
