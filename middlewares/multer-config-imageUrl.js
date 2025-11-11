@@ -47,10 +47,16 @@ const uploadAndOptimizeImageProject = async (req, res, next) => {
         const tempFilePath = path.join(req.file.destination, `temp_${req.optimizedFilename}`);
         const optimizedFilePath = path.join(req.file.destination, req.optimizedFilename);
 
-        // Optimiser l'image vers un fichier temporaire
+        // Optimiser l'image vers un fichier temporaire avec des paramètres plus rapides
         await sharp(originalFilePath)
-            .resize(800)
-            .webp({ quality: 80 })
+            .resize(800, null, {
+                fit: 'inside',
+                withoutEnlargement: true
+            })
+            .webp({
+                quality: 80,
+                effort: 1  // Faster processing (0-6, lower = faster)
+            })
             .toFile(tempFilePath);
 
         // Supprimer le fichier original et renommer le fichier temporaire
